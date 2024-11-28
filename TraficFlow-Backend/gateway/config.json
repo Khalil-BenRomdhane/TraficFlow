@@ -1,0 +1,9 @@
+{
+    "model_services": {
+      "service_cluster_1": "http://127.0.0.1:5001/predict",
+      "service_cluster_2": "http://127.0.0.1:5002/predict",
+      "service_cluster_3": "http://127.0.0.1:5003/predict",
+      "searchQuerService":"http://127.0.0.1:5010/search"
+    }
+  }
+  
