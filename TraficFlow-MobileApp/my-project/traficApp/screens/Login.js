@@ -1,22 +1,29 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import { auth } from '../Services/Config'; // Import correct des services Firebase
+import { signInWithEmailAndPassword } from "firebase/auth";
 
-const LoginScreen = ({ navigation }) => {
+const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+
   // Fonction pour gérer la connexion
   const handleLogin = () => {
-    if (email && password) {
-      // Logique de connexion (vous pouvez intégrer Firebase ou une API ici)
-      console.log('Connexion réussie avec:', email, password);
-      // Naviguer vers l'écran d'accueil ou un autre écran après la connexion réussie
-      navigation.replace('Home'); // Remplacez 'Home' par le nom de l'écran vers lequel vous souhaitez naviguer
-    } else {
-      alert('Veuillez remplir tous les champs');
+    if (!email || !password) {
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+      return;
     }
-  };
 
+    signInWithEmailAndPassword(auth, email, password) // Passer `auth` en premier argument
+      .then(() => {
+        console.log('Utilisateur connecté avec succès!');
+        navigation.navigate('ChoiceScreen'); // Naviguer vers la page "ChoiceScreen" après la connexion
+      })
+      .catch(error => {
+        Alert.alert('Erreur', error.message);
+      });
+  };
   return (
     <KeyboardAvoidingView 
       style={styles.container} 
@@ -113,4 +120,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default Login;

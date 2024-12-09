@@ -1,31 +1,92 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
+} from 'react-native';
+import { auth } from '../Services/Config'; // Import correct de Firebase Auth
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 
 const SignupScreen = ({ navigation }) => {
+  const [username, setUsername] = useState(''); // Nouveau champ pour le nom d'utilisateur
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Fonction pour gérer l'inscription
   const handleSignup = () => {
-    if (email && password) {
-      // Logique d'inscription (vous pouvez intégrer Firebase ou une API ici)
-      console.log('Inscription réussie avec:', email, password);
-      // Naviguer vers l'écran de connexion après l'inscription
-      navigation.replace('Login'); // Remplacez 'Login' par le nom de l'écran de connexion
-    } else {
-      alert('Veuillez remplir tous les champs');
+    if (!username || !email || !password || !confirmPassword) {
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+      return;
     }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log('Utilisateur créé :', user.email);
+
+        // Mettre à jour le nom d'utilisateur
+        updateProfile(user, {
+          displayName: username,
+        })
+          .then(() => {
+            console.log('Nom d\'utilisateur mis à jour:', user.displayName);
+
+            // Envoi de l'email de vérification
+            sendEmailVerification(user)
+              .then(() => {
+                Alert.alert(
+                  'Succès',
+                  `Compte créé avec succès ! Un email de vérification a été envoyé à ${user.email}.`
+                );
+                navigation.replace('Login'); // Naviguer vers l'écran de connexion
+              })
+              .catch((error) => {
+                console.error('Erreur lors de l\'envoi de l\'email de vérification :', error.message);
+                Alert.alert('Erreur', "Impossible d'envoyer l'email de vérification. Veuillez réessayer.");
+              });
+          })
+          .catch((error) => {
+            console.error('Erreur lors de la mise à jour du nom d\'utilisateur :', error.message);
+            Alert.alert('Erreur', 'Impossible de définir le nom d\'utilisateur. Veuillez réessayer.');
+          });
+      })
+      .catch((error) => {
+        console.error('Erreur lors de l\'inscription :', error.message);
+        Alert.alert('Erreur', error.message);
+      });
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // Différentes configurations pour iOS et Android
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.innerContainer}>
-          <Text style={styles.title}>Créer un compte</Text>
+          <Text style={styles.title}>Créer un compte TraficFlow</Text>
           <Text style={styles.subtitle}>Veuillez remplir les informations pour vous inscrire</Text>
+
+          {/* Champ Nom d'utilisateur */}
+          <TextInput
+            style={styles.input}
+            placeholder="Entrez votre nom d'utilisateur"
+            placeholderTextColor="#888"
+            value={username}
+            onChangeText={(text) => setUsername(text)}
+          />
 
           {/* Champ Email */}
           <TextInput
@@ -44,6 +105,16 @@ const SignupScreen = ({ navigation }) => {
             placeholderTextColor="#888"
             value={password}
             onChangeText={(text) => setPassword(text)}
+            secureTextEntry
+          />
+
+          {/* Champ Confirmer le mot de passe */}
+          <TextInput
+            style={styles.input}
+            placeholder="Confirmez votre mot de passe"
+            placeholderTextColor="#888"
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
             secureTextEntry
           />
 

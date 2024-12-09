@@ -11,6 +11,7 @@ import TrafficMap from './screens/PrevisionMap';  // Corrigé ici, TrafficMap vi
 import LoginScreen from './screens/Login';
 import SignupScreen from './screens/SignUp';
 import Predire from './screens/Predire';
+import Suivie from './screens/Suivie'
 
 
 const Stack = createStackNavigator();
@@ -24,11 +25,17 @@ export default function App() {
           component={Predire}
           options={{ headerShown: false }}
              />
+
           <Stack.Screen
           name="Splash"
           component={Splash}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+        name="Suivie"
+        component={Suivie}
+        options={{ headerShown: false }}
+      />
         <Stack.Screen
           name="Home"
           component={TrafficMap}  // Assurez-vous que TrafficMap est dans le bon fichier

@@ -144,13 +144,13 @@ const DataVue = () => {
 
   const getChartData = () => {
     const now = moment();
-    const currentMonth = now.month();
+    const currentMonth = now.month()+1;
     let filteredData = [];
   
     let selectedCluster = null;
-    if (currentMonth >= 0 && currentMonth <= 3) {
+    if (currentMonth >= 1 && currentMonth <= 4) {
       selectedCluster = cluster1; // Janvier à mars
-    } else if (currentMonth >= 4 && currentMonth <= 6) {
+    } else if (currentMonth >= 5 && currentMonth <= 9) {
       selectedCluster = cluster2; // Avril à juin
     } else {
       selectedCluster = cluster3; // Juillet à décembre
